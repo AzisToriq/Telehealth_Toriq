@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PulseCare Telehealth — Portal Self-Assessment Pasien</title>
+  <meta name="description" content="Portal Self-Assessment Telehealth berbasis REST API v2.0 untuk pengisian keluhan pra-konsultasi, skrining GAD-7, analitik klinis, pelacakan status peninjauan, klarifikasi, dan tindak lanjut." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- Ambient Aurora Backdrop -->
+  <div class="aurora-bg" aria-hidden="true">
+    <div class="aurora-orb orb-1"></div>
+    <div class="aurora-orb orb-2"></div>
+    <div class="aurora-orb orb-3"></div>
+  </div>
+
+  <div id="app-shell" class="app-shell">
+    <!-- 1. LANDING NAVBAR (Hanya tampil di halaman Welcome) -->
+    <header class="floating-header-wrap" id="landing-header">
+      <div class="floating-navbar">
+        <div class="nav-left">
+          <a href="#welcome" class="brand">
+            <div class="brand-logo" aria-hidden="true">
+              <svg viewBox="0 0 28 28" fill="none" width="22" height="22">
+                <path d="M4 14h4.5l2.5-6.5 4 13 2.8-6.5H24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="brand-text">
+              <span class="brand-name">PulseCare</span>
+              <span class="brand-sub">Telehealth v2.0</span>
+            </div>
+          </a>
+        </div>
+
+        <nav class="center-nav landing-links" aria-label="Navigasi Halaman Awal">
+          <button type="button" class="pill-nav-item" data-scroll-to="sec-preview">Pratinjau</button>
+          <button type="button" class="pill-nav-item" data-scroll-to="sec-workflow">Cara Kerja</button>
+          <button type="button" class="pill-nav-item" data-scroll-to="sec-features">Fitur Utama</button>
+          <button type="button" class="pill-nav-item" data-scroll-to="sec-access">Akses Demo</button>
+        </nav>
+
+        <div class="nav-right">
+          <button type="button" class="icon-only-btn" id="btn-landing-theme" title="Mode Gelap / Terang" aria-label="Ganti Tema">
+            <span id="landing-theme-icon"></span>
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm desktop-only-inline" id="btn-nav-demo">
+            <span data-icon="sparkles"></span> Coba Demo
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-nav-enter">
+            <span data-icon="lock"></span> Akses Pemilik
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. APP NAVBAR (Hanya tampil setelah masuk ke dalam aplikasi) -->
+    <header class="floating-header-wrap hidden" id="app-header">
+      <div class="floating-navbar">
+        <div class="nav-left">
+          <button type="button" class="back-btn hidden" id="topbar-back" aria-label="Kembali">
+            <span data-icon="arrowLeft"></span>
+          </button>
+          <a href="#welcome" class="brand" title="Kembali ke Halaman Selamat Datang">
+            <div class="brand-logo" aria-hidden="true">
+              <svg viewBox="0 0 28 28" fill="none" width="22" height="22">
+                <path d="M4 14h4.5l2.5-6.5 4 13 2.8-6.5H24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="brand-text">
+              <span class="brand-name">PulseCare</span>
+              <span class="brand-sub">Telehealth v2.0</span>
+            </div>
+          </a>
+        </div>
+
+        <nav class="center-nav" id="center-nav" aria-label="Navigasi Aplikasi">
+          <a href="#home" class="pill-nav-item" data-route="home">
+            <span data-icon="home"></span>
+            <span>Beranda</span>
+          </a>
+          <a href="#history" class="pill-nav-item" data-route="history">
+            <span data-icon="history"></span>
+            <span>Riwayat</span>
+            <span class="nav-badge hidden" id="nav-clarification-badge">0</span>
+          </a>
+          <a href="#analytics" class="pill-nav-item" data-route="analytics">
+            <span data-icon="barChart"></span>
+            <span>Analitik</span>
+          </a>
+          <a href="#uts" class="pill-nav-item" data-route="uts">
+            <span data-icon="award"></span>
+            <span>UTS</span>
+            <span class="nav-pill-uts hidden" id="nav-uts-score">0/10</span>
+          </a>
+          <a href="#settings" class="pill-nav-item" data-route="settings">
+            <span data-icon="settings"></span>
+            <span>Pengaturan</span>
+          </a>
+        </nav>
+
+        <div class="nav-right">
+          <button type="button" class="mode-chip" id="btn-mode-chip" title="Ganti Mode / Akun Pasien">
+            <span class="status-dot" id="topbar-status-dot"></span>
+            <span id="topbar-mode-text">Live API</span>
+          </button>
+          <button type="button" class="icon-only-btn" id="btn-open-cmd" title="Pencarian Cepat (Ctrl+K)" aria-label="Pencarian Cepat">
+            <span data-icon="search"></span>
+          </button>
+          <button type="button" class="icon-only-btn" id="btn-toggle-inspector" title="Live API Inspector" aria-label="API Inspector">
+            <span data-icon="terminal"></span>
+            <span class="mini-counter hidden" id="api-log-count">0</span>
+          </button>
+          <button type="button" class="icon-only-btn" id="btn-toggle-theme" title="Mode Gelap / Terang" aria-label="Ganti Tema">
+            <span id="theme-icon"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Active Mode Banner (Shown when in Public Demo Sandbox Mode inside App) -->
+    <div class="demo-banner-wrap hidden" id="demo-banner-wrap">
+      <div class="demo-banner">
+        <div class="demo-banner-left">
+          <span class="badge badge-indigo">MODE DEMO INTERAKTIF</span>
+          <span>100% simulasi lokal (Pure Sandbox) — tidak menyentuh atau mengubah data server API asli. Bebas diuji untuk formulir, GAD-7, klarifikasi, dan tindak lanjut.</span>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-demo-data">Reset Demo</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-banner-live"><span data-icon="lock"></span> Masuk Pemilik (Live API)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Centered Context Subheader (Shown inside App views) -->
+    <div class="context-bar hidden" id="context-bar">
+      <div class="context-bar-inner">
+        <div>
+          <h1 class="page-heading" id="topbar-title">Beranda</h1>
+          <p class="page-subheading" id="topbar-subtitle">Portal Self-Assessment Pasien</p>
+        </div>
+        <div class="context-actions" id="context-actions">
+          <button type="button" class="profile-chip" id="btn-quick-switch" title="Ganti Mode / Akun Pasien Simulasi">
+            <span class="chip-avatar" id="header-avatar">AT</span>
+            <span class="chip-meta">
+              <strong id="header-user-name">Azis Toriq Maulana</strong>
+              <small id="header-user-sub">C2C023180 · P-001</small>
+            </span>
+            <span data-icon="repeat" style="opacity:0.65;"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Centered Main Content Canvas -->
+    <main id="view-root" class="view-root" tabindex="-1"></main>
+
+    <!-- Centered Footer -->
+    <footer class="app-footer">
+      <div class="footer-inner">
+        <div class="footer-disclaimer">
+          <span data-icon="shieldAlert"></span>
+          <span><strong>Pernyataan Klinis:</strong> Hasil self-assessment <strong>bukan diagnosis medis</strong>. Seluruh laporan digunakan sebagai informasi awal bagi tenaga kesehatan untuk peninjauan dan tindak lanjut.</span>
+        </div>
+        <div class="footer-meta">
+          <span>PulseCare Telehealth · REST API v2.0</span>
+          <span>•</span>
+          <span>Azis Toriq Maulana (C2C023180)</span>
+          <span>•</span>
+          <a href="#welcome" style="text-decoration:underline;">Halaman Awal</a>
+          <span>•</span>
+          <a href="#settings" style="text-decoration:underline;">Pengaturan API</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Mobile Floating Bottom Dock (Hidden on Welcome page) -->
+    <nav class="bottom-nav hidden" id="bottom-nav" aria-label="Navigasi Bawah">
+      <a href="#home" class="bottom-nav-item" data-route="home">
+        <span data-icon="home"></span>
+        <span>Beranda</span>
+      </a>
+      <a href="#history" class="bottom-nav-item" data-route="history">
+        <span data-icon="history"></span>
+        <span>Riwayat</span>
+        <span class="bottom-badge hidden" id="mobile-clarification-badge">0</span>
+      </a>
+      <a href="#analytics" class="bottom-nav-item" data-route="analytics">
+        <span data-icon="barChart"></span>
+        <span>Analitik</span>
+      </a>
+      <a href="#uts" class="bottom-nav-item" data-route="uts">
+        <span data-icon="award"></span>
+        <span>UTS</span>
+      </a>
+      <a href="#settings" class="bottom-nav-item" data-route="settings">
+        <span data-icon="settings"></span>
+        <span>Atur</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Live API Network Inspector Drawer -->
+  <div class="drawer-backdrop hidden" id="inspector-backdrop"></div>
+  <aside class="inspector-drawer hidden" id="inspector-drawer" aria-label="Live API Inspector">
+    <div class="drawer-header">
+      <div>
+        <h3>Live API Network Inspector</h3>
+        <p>Klik item log untuk membedah Request Payload &amp; JSON Response</p>
+      </div>
+      <div class="drawer-header-actions">
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-clear-logs">Bersihkan</button>
+        <button type="button" class="icon-only-btn" id="btn-close-inspector" aria-label="Tutup">
+          <span data-icon="x"></span>
+        </button>
+      </div>
+    </div>
+    <div class="drawer-body" id="inspector-log-list">
+      <div class="empty-mini">Belum ada aktivitas API pada sesi ini.</div>
+    </div>
+  </aside>
+
+  <!-- Command Palette (Ctrl + K) -->
+  <div class="modal-backdrop hidden" id="cmd-backdrop" role="dialog" aria-modal="true" aria-label="Pencarian Cepat">
+    <div class="cmd-card">
+      <div class="cmd-input-wrap">
+        <span data-icon="search"></span>
+        <input type="text" id="cmd-input" class="cmd-input" placeholder="Ketik menu, formulir, atau perintah (mis. GAD-7, Demo, UTS, Dark)..." autocomplete="off" />
+        <kbd class="kbd">ESC</kbd>
+      </div>
+      <div class="cmd-list" id="cmd-list"></div>
+    </div>
+  </div>
+
+  <!-- Confirmation / Quick Switcher Modal -->
+  <div class="modal-backdrop hidden" id="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-card" id="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title">Konfirmasi</h3>
+        <button type="button" class="icon-only-btn" id="modal-close" aria-label="Tutup">
+          <span data-icon="x"></span>
+        </button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer" id="modal-footer"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Optional local secrets (ignored by .gitignore on GitHub; loads seamlessly locally) -->
+  <script defer src="js/secrets.local.js" onerror="void(0)"></script>
+  <script defer src="js/config.js"></script>
+  <script defer src="js/utils.js"></script>
+  <script defer src="js/demo-mock.js"></script>
+  <script defer src="js/api.js"></script>
+  <script defer src="js/form-engine.js"></script>
+  <script defer src="js/charts.js"></script>
+  <script defer src="js/views.js"></script>
+  <script defer src="js/app.js"></script>
+</body>
+</html>

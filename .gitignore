@@ -1,0 +1,25 @@
+# Local secrets & API tokens (tidak pernah di-push ke repository publik)
+js/secrets.local.js
+.env
+.env.local
+.env.*.local
+
+# Vercel & build outputs
+.vercel
+dist/
+build/
+
+# Dependencies & logs
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+*.log
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
