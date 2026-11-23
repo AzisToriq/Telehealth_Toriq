@@ -27,25 +27,4 @@ Dikembangkan oleh **Azis Toriq Maulana** (`C2C023180` · Kelas `E REGULER`).
 
 > **Keamanan Token:** File `js/secrets.local.js` menyimpan token pasien lokal untuk pengembangan dan **sudah diabaikan oleh `.gitignore`** agar tidak terunggah ke repository publik.
 
----
-
-## Panduan Push ke GitHub & Deploy ke Vercel
-
-### 1. Push ke GitHub
-```bash
-cd UTS_Telehealth_ToriqGanteng
-git init
-git status
-# Pastikan js/secrets.local.js TIDAK muncul di daftar file yang akan di-commit
-git add .
-git commit -m "Initial commit: PulseCare Telehealth Self-Assessment Frontend"
-git branch -M main
-git remote add origin https://github.com/<USERNAME_ANDA>/<NAMA_REPO>.git
-git push -u origin main
-```
-
-### 2. Deploy ke Vercel
-1. Masuk ke [vercel.com](https://vercel.com) menggunakan akun GitHub Anda.
-2. Pilih **Add New... → Project** lalu impor repository GitHub Anda.
-3. Biarkan **Framework Preset: Other** dan **Build Command** kosong, lalu klik **Deploy**.
-4. Pengunjung publik otomatis masuk lewat **Mode Demo Pure Sandbox**, sementara pemilik dapat masuk ke **Live API** melalui tombol **Akses Pemilik** dengan verifikasi password.
+--
